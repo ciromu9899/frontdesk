@@ -144,5 +144,6 @@ disabled-user accessibility study, deployment-specific legal review, production
 recovery exercise, secret rotation, and signed installer remain purchaser or
 seller release gates; automated checks do not replace them.
 
-See `docs/data-responsibility.md`, `docs/compliance-readiness.md`, and
-`docs/legal/README.md` for the responsibility matrix and current draft documents.
+See [`docs/data-responsibility.md`](data-responsibility.md) for the published
+responsibility matrix. Internal compliance and counsel-review drafts are not
+part of the public repository.
