@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 import zipfile
 from datetime import datetime, timezone
@@ -54,10 +55,21 @@ def version() -> str:
 
 def source_files() -> list[Path]:
     files = []
-    for path in sorted(ROOT.rglob("*")):
+    try:
+        tracked = subprocess.run(
+            ["git", "ls-files", "-z"], cwd=ROOT, check=True,
+            capture_output=True,
+        ).stdout.split(b"\0")
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError("release builds require a Git checkout") from exc
+    for raw in sorted(item for item in tracked if item):
+        try:
+            relative = Path(raw.decode("utf-8"))
+        except UnicodeDecodeError as exc:
+            raise RuntimeError("tracked file name is not valid UTF-8") from exc
+        path = ROOT / relative
         if not path.is_file():
             continue
-        relative = path.relative_to(ROOT)
         if set(relative.parts) & SKIP_PARTS or path.suffix.lower() in SKIP_SUFFIXES:
             continue
         if relative.as_posix() in CUSTOMER_EXCLUDED_FILES:
