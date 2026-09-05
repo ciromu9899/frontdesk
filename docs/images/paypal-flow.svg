@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="650" viewBox="0 0 1040 650" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">
+<rect width="1040" height="650" fill="#ffffff"/>
+<text x="38" y="54" font-size="27" fill="#0a3069" font-weight="700" text-anchor="start" xml:space="preserve">Taking a payment with PayPal</text>
+<text x="38" y="84" font-size="15" fill="#57606a" font-weight="400" text-anchor="start" xml:space="preserve">Frontdesk completes the sale end to end — without ever handling card data.</text>
+<rect x="38" y="112" width="220" height="196" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+<circle cx="70" cy="148" r="16" fill="#2f6feb"/>
+<text x="70" y="153" font-size="15" fill="#ffffff" font-weight="700" text-anchor="middle" xml:space="preserve">1</text>
+<text x="96" y="154" font-size="16" fill="#0a3069" font-weight="700" text-anchor="start" xml:space="preserve">Create order</text>
+<text x="58" y="188" font-size="11.5" fill="#2f6feb" font-weight="600" text-anchor="start" xml:space="preserve">Frontdesk → PayPal</text>
+<text x="58" y="216" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">Sends the amount and what</text>
+<text x="58" y="235" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">it's for. Returns a link for</text>
+<text x="58" y="254" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">the customer to approve.</text>
+<path d="M264,210.0 l14,0" stroke="#8c959f" stroke-width="2"/><path d="M276,205.0 l6,5 l-6,5 z" fill="#8c959f"/>
+<rect x="286" y="112" width="220" height="196" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+<circle cx="318" cy="148" r="16" fill="#2f6feb"/>
+<text x="318" y="153" font-size="15" fill="#ffffff" font-weight="700" text-anchor="middle" xml:space="preserve">2</text>
+<text x="344" y="154" font-size="16" fill="#0a3069" font-weight="700" text-anchor="start" xml:space="preserve">Customer approves</text>
+<text x="306" y="188" font-size="11.5" fill="#2f6feb" font-weight="600" text-anchor="start" xml:space="preserve">Customer → PayPal</text>
+<text x="306" y="216" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">Approval happens on PayPal's</text>
+<text x="306" y="235" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">own page. Card details never</text>
+<text x="306" y="254" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">reach Frontdesk.</text>
+<path d="M512,210.0 l14,0" stroke="#8c959f" stroke-width="2"/><path d="M524,205.0 l6,5 l-6,5 z" fill="#8c959f"/>
+<rect x="534" y="112" width="220" height="196" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+<circle cx="566" cy="148" r="16" fill="#2f6feb"/>
+<text x="566" y="153" font-size="15" fill="#ffffff" font-weight="700" text-anchor="middle" xml:space="preserve">3</text>
+<text x="592" y="154" font-size="16" fill="#0a3069" font-weight="700" text-anchor="start" xml:space="preserve">Verify</text>
+<text x="554" y="188" font-size="11.5" fill="#2f6feb" font-weight="600" text-anchor="start" xml:space="preserve">Frontdesk → PayPal</text>
+<text x="554" y="216" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">Frontdesk checks that the</text>
+<text x="554" y="235" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">order really is APPROVED</text>
+<text x="554" y="254" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">before going further.</text>
+<path d="M760,210.0 l14,0" stroke="#8c959f" stroke-width="2"/><path d="M772,205.0 l6,5 l-6,5 z" fill="#8c959f"/>
+<rect x="782" y="112" width="220" height="196" rx="10" fill="#fffdf5" stroke="#bf8700" stroke-width="2"/>
+<circle cx="814" cy="148" r="16" fill="#bf8700"/>
+<text x="814" y="153" font-size="15" fill="#ffffff" font-weight="700" text-anchor="middle" xml:space="preserve">4</text>
+<text x="840" y="154" font-size="16" fill="#0a3069" font-weight="700" text-anchor="start" xml:space="preserve">Charge</text>
+<text x="802" y="188" font-size="11.5" fill="#bf8700" font-weight="600" text-anchor="start" xml:space="preserve">Frontdesk → PayPal</text>
+<text x="802" y="216" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">Runs only after an explicit</text>
+<text x="802" y="235" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">yes. Idempotent, so a retry</text>
+<text x="802" y="254" font-size="12.5" fill="#24292f" font-weight="400" text-anchor="start" xml:space="preserve">cannot double-charge.</text>
+<rect x="38" y="326" width="716" height="36" rx="8" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="396.0" y="350" font-size="13.5" fill="#57606a" font-weight="600" text-anchor="middle" xml:space="preserve">No money has moved yet</text>
+<rect x="782" y="326" width="220" height="36" rx="8" fill="#fff4d6" stroke="#bf8700" stroke-width="1.6"/>
+<text x="892" y="350" font-size="13.5" fill="#7a5200" font-weight="700" text-anchor="middle" xml:space="preserve">Money moves here</text>
+<rect x="38" y="388" width="470" height="96" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+<rect x="38" y="388" width="4" height="96" rx="2" fill="#8250df"/>
+<text x="58" y="416" font-size="14.5" fill="#0a3069" font-weight="700" text-anchor="start" xml:space="preserve">Card data never enters the agent</text>
+<text x="58" y="438" font-size="12" fill="#57606a" font-weight="400" text-anchor="start" xml:space="preserve">Frontdesk holds an order ID, not a card. Nothing</text>
+<text x="58" y="455" font-size="12" fill="#57606a" font-weight="400" text-anchor="start" xml:space="preserve">in the conversation can leak a payment credential,</text>
+<text x="58" y="472" font-size="12" fill="#57606a" font-weight="400" text-anchor="start" xml:space="preserve">because the credential was never there.</text>
+<rect x="532" y="388" width="470" height="96" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.5"/>
+<rect x="532" y="388" width="4" height="96" rx="2" fill="#bf8700"/>
+<text x="552" y="416" font-size="14.5" fill="#0a3069" font-weight="700" text-anchor="start" xml:space="preserve">A charge needs a human yes</text>
+<text x="552" y="438" font-size="12" fill="#57606a" font-weight="400" text-anchor="start" xml:space="preserve">Creating an order is free to do. Capturing it is not,</text>
+<text x="552" y="455" font-size="12" fill="#57606a" font-weight="400" text-anchor="start" xml:space="preserve">so it sits behind the confirmation gate — and is</text>
+<text x="552" y="472" font-size="12" fill="#57606a" font-weight="400" text-anchor="start" xml:space="preserve">declined outright when no one can approve.</text>
+<text x="38" y="500" font-size="12" fill="#57606a" font-weight="600" text-anchor="start" xml:space="preserve">What the operator actually sees</text>
+<rect x="38" y="508" width="964" height="106" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+<text x="58" y="540" font-size="13.5" fill="#e3b341" font-weight="400" text-anchor="start" font-family="Consolas, monospace" xml:space="preserve">  [confirm] Charge PayPal order 5O190127TN364715T (money moves now)</text>
+<text x="58" y="564" font-size="13.5" fill="#e3b341" font-weight="400" text-anchor="start" font-family="Consolas, monospace" xml:space="preserve">  Run this? [y/N] y</text>
+<text x="58" y="588" font-size="13.5" fill="#8b949e" font-weight="400" text-anchor="start" font-family="Consolas, monospace" xml:space="preserve">  [result] {"status": "COMPLETED", "captures": [{"capture_id": "3C679366HH908993F"…</text>
+</svg>

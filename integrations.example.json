@@ -1,0 +1,37 @@
+{
+  "tenants": {
+    "customer-a": {
+      "shopify": {
+        "base_url": "https://customer-a.myshopify.com",
+        "token_env": "CUSTOMER_A_SHOPIFY_TOKEN",
+        "timeout": 15,
+        "max_retries": 2,
+        "retry_base_delay": 0.25,
+        "retry_max_delay": 5,
+        "circuit_failure_threshold": 5,
+        "circuit_recovery_timeout": 30
+      },
+      "zendesk": {
+        "base_url": "https://customer-a.zendesk.com",
+        "token_env": "CUSTOMER_A_ZENDESK_TOKEN",
+        "timeout": 15,
+        "max_retries": 2
+      },
+      "hubspot": {
+        "base_url": "https://api.hubapi.com",
+        "token_env": "CUSTOMER_A_HUBSPOT_TOKEN",
+        "pipeline": "0",
+        "stage": "1",
+        "timeout": 15,
+        "max_retries": 2
+      },
+      "email": {
+        "smtp_host": "smtp.example.com",
+        "smtp_port": 465,
+        "username_env": "CUSTOMER_A_SMTP_USERNAME",
+        "password_env": "CUSTOMER_A_SMTP_PASSWORD",
+        "from": "support@example.com"
+      }
+    }
+  }
+}

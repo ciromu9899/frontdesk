@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="A visual quick-start and daily workflow guide for the self-hosted FrontDesk customer-support chatbot.">
+  <title>FrontDesk — Visual quick-start and daily workflow</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink:#102a43; --muted:#52677a; --paper:#fffdf8; --line:#d9e5ec;
+      --teal:#0f766e; --blue:#1d4ed8; --amber:#b45309; --coral:#dc493a;
+      --soft-teal:#e7f8f5; --soft-blue:#eaf1ff; --soft-amber:#fff5db;
+      --soft-coral:#fff0ed; --shadow:0 22px 70px rgba(16,42,67,.12);
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:18px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    a { color:var(--blue); text-underline-offset:.2em; }
+    a:focus-visible, button:focus-visible { outline:4px solid #f59e0b; outline-offset:4px; }
+    img { max-width:100%; height:auto; }
+    .skip { position:absolute; left:-9999px; top:1rem; z-index:20; padding:.75rem 1rem; background:#fff; }
+    .skip:focus { left:1rem; }
+    .wrap { width:min(1180px,calc(100% - 2rem)); margin-inline:auto; }
+    header { padding:1rem 0; border-bottom:1px solid var(--line); background:rgba(255,253,248,.96); }
+    nav { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+    .brand { color:var(--teal); font-size:1.45rem; font-weight:900; text-decoration:none; }
+    .navlinks { display:flex; gap:1.1rem; flex-wrap:wrap; font-size:.9rem; }
+    .hero { padding:clamp(4rem,10vw,8rem) 0 4rem; text-align:center; }
+    .eyebrow { color:var(--blue); font-weight:900; letter-spacing:.12em; text-transform:uppercase; font-size:.78rem; }
+    h1 { max-width:980px; margin:.45rem auto 1rem; font-size:clamp(3rem,8vw,6.6rem); line-height:.96; letter-spacing:-.06em; }
+    .hero strong { color:var(--teal); }
+    .lede { max-width:790px; margin:0 auto 1.8rem; color:var(--muted); font-size:clamp(1.1rem,2.2vw,1.45rem); }
+    .actions { display:flex; justify-content:center; gap:.8rem; flex-wrap:wrap; }
+    .button { display:inline-block; border-radius:999px; padding:.8rem 1.25rem; font-weight:850; text-decoration:none; border:2px solid var(--ink); }
+    .primary { color:white; background:var(--teal); border-color:var(--teal); }
+    .secondary { color:var(--ink); background:white; }
+    .note { margin:1rem auto 0; max-width:700px; color:var(--muted); font-size:.82rem; }
+    section { padding:clamp(3rem,8vw,6.5rem) 0; }
+    .section-title { max-width:850px; margin:0 0 2rem; font-size:clamp(2.1rem,5vw,4.4rem); line-height:1.04; letter-spacing:-.045em; }
+    .section-title span { color:var(--coral); }
+    .flow { border:1px solid var(--line); border-radius:30px; overflow:hidden; background:white; box-shadow:var(--shadow); }
+    .flow img { display:block; width:100%; }
+    .steps, .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+    .step, .card { border:1px solid var(--line); border-radius:22px; padding:1.25rem; background:white; }
+    .step:nth-child(1) { background:var(--soft-teal); }
+    .step:nth-child(2) { background:var(--soft-blue); }
+    .step:nth-child(3) { background:var(--soft-amber); }
+    .step:nth-child(4) { background:var(--soft-coral); }
+    .num { font-size:2rem; font-weight:950; line-height:1; color:var(--blue); }
+    h2, h3 { line-height:1.15; }
+    .setup { display:grid; grid-template-columns:.82fr 1.18fr; gap:2rem; align-items:start; }
+    .checklist { counter-reset:setup; display:grid; gap:1rem; }
+    .check { counter-increment:setup; display:grid; grid-template-columns:auto 1fr; gap:1rem; padding:1.25rem; background:white; border:1px solid var(--line); border-radius:18px; }
+    .check::before { content:counter(setup); display:grid; place-items:center; width:2.5rem; height:2.5rem; border-radius:50%; background:var(--blue); color:white; font-weight:900; }
+    pre { overflow:auto; margin:.65rem 0 0; padding:1rem; border-radius:12px; background:#102a43; color:#f0f7fa; font-size:.78rem; }
+    .workspace { background:#102a43; color:white; }
+    .workspace .section-title span { color:#68e3d2; }
+    .workspace .card { background:#173b57; border-color:#315b76; }
+    .workspace .card p { color:#d5e3ec; }
+    .cards { grid-template-columns:repeat(3,1fr); }
+    .cards h3 { margin-top:.15rem; }
+    .kicker { color:var(--coral); text-transform:uppercase; font-size:.75rem; letter-spacing:.1em; font-weight:900; }
+    .personas { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; }
+    .persona { padding:1rem; border-radius:16px; border:1px solid var(--line); background:white; }
+    .persona b { color:var(--teal); }
+    .disclosure { padding:1rem 1.2rem; margin-bottom:1.5rem; border:3px solid var(--amber); border-radius:16px; background:var(--soft-amber); font-weight:750; }
+    .buy { text-align:center; border-radius:36px; padding:clamp(2rem,7vw,5rem); background:linear-gradient(135deg,var(--soft-teal),var(--soft-blue)); border:1px solid var(--line); }
+    .price { margin:.25rem 0; font-size:clamp(2.5rem,7vw,5rem); font-weight:950; color:var(--blue); }
+    footer { padding:2.5rem 0; border-top:1px solid var(--line); color:var(--muted); font-size:.82rem; }
+    @media (max-width:850px) { .steps,.cards,.personas { grid-template-columns:repeat(2,1fr); } .setup { grid-template-columns:1fr; } }
+    @media (max-width:560px) { .steps,.cards,.personas { grid-template-columns:1fr; } h1 { font-size:3.15rem; } }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <header>
+    <nav class="wrap" aria-label="Primary">
+      <a class="brand" href="../README.md">FrontDesk</a>
+      <div class="navlinks">
+        <a href="#flow">How it works</a><a href="#setup">Set up</a>
+        <a href="#daily">Daily use</a><a href="#examples">Examples</a><a href="#buy">Buy</a>
+      </div>
+    </nav>
+  </header>
+  <main id="main">
+    <section class="hero">
+      <div class="wrap">
+        <p class="eyebrow">Self-hosted customer support • US + UK</p>
+        <h1>Support that knows when to <strong>hand off.</strong></h1>
+        <p class="lede">Put web chat, email and purchaser-owned channels into one workflow. Answer from approved knowledge, move uncertain work to a person, and improve from CSAT.</p>
+        <div class="actions">
+          <a class="button primary" href="#setup">See the 5-minute path</a>
+          <a class="button secondary" href="https://www.paypal.com/ncp/payment/9SDPW2BCLUB44">Shop plan — $699</a>
+        </div>
+        <p class="note">One-time FrontDesk package sold by ShellieSoftwareTools. PayPal is the external sales checkout; FrontDesk itself does not process this product purchase.</p>
+      </div>
+    </section>
+
+    <section id="flow">
+      <div class="wrap">
+        <h2 class="section-title">One clear flow from first question to <span>better support.</span></h2>
+        <figure class="flow">
+          <img src="images/frontdesk-workflow-2026.png" width="1776" height="887" alt="Four-step FrontDesk flow: connect channels, answer from approved knowledge, hand off to a person, then improve using analytics.">
+        </figure>
+        <div class="steps" aria-label="Workflow details">
+          <article class="step"><div class="num">01</div><h3>Connect</h3><p>Embed web chat and configure only the purchaser-owned channels you need.</p></article>
+          <article class="step"><div class="num">02</div><h3>Answer</h3><p>Use approved PDF and Office knowledge with citations and explicit tool boundaries.</p></article>
+          <article class="step"><div class="num">03</div><h3>Hand off</h3><p>Put unresolved work in the shared inbox with assignment, notes and takeover.</p></article>
+          <article class="step"><div class="num">04</div><h3>Improve</h3><p>Review CSAT, queue metrics and knowledge gaps without inventing customer claims.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="setup">
+      <div class="wrap setup">
+        <div><p class="kicker">Quick start</p><h2 class="section-title">From package to working web chat in <span>three choices.</span></h2><p>On Windows, double-click <strong>Start FrontDesk.cmd</strong>. On macOS or Linux, run <code>python quickstart.py --guided</code>.</p></div>
+        <div class="checklist">
+          <article class="check"><div><strong>Choose your market</strong><p>United States or United Kingdom.</p></div></article>
+          <article class="check"><div><strong>Choose the customer language</strong><p>English, or US Spanish for a US installation.</p></div></article>
+          <article class="check"><div><strong>Choose the answer engine</strong><p>Ollama for real local AI, or Echo for a safe demonstration.</p></div></article>
+          <article class="check"><div><strong>Use the opened pages</strong><p>The launcher starts customer chat and the shared inbox, opens both, and copies the temporary administrator token.</p></div></article>
+          <article class="check"><div><strong>Stop safely</strong><p>Press Ctrl+C in the launcher window to stop both services. Authentication material is not written to a file.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace" id="daily">
+      <div class="wrap">
+        <p class="kicker">Everyday operations</p>
+        <h2 class="section-title">A shared workspace built for the <span>human team.</span></h2>
+        <div class="cards">
+          <article class="card"><h3>Shared inbox</h3><p>Keep web and supported purchaser-owned channel conversations in a persistent tenant-scoped queue.</p></article>
+          <article class="card"><h3>Human takeover</h3><p>Assign a thread, add internal notes and take over when the bot reaches its boundary.</p></article>
+          <article class="card"><h3>Step-up identity</h3><p>Leave public knowledge open to guests while protecting account-specific actions behind verified identity.</p></article>
+          <article class="card"><h3>Knowledge control</h3><p>Load PDF, DOCX, PPTX, XLSX, HTML, Markdown and text into the purchaser-controlled index.</p></article>
+          <article class="card"><h3>CSAT and analytics</h3><p>Review satisfaction, volume and resolution signals to decide which content needs work.</p></article>
+          <article class="card"><h3>Operational evidence</h3><p>Use durable state, webhook deduplication, audit checks and published recovery procedures.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="examples">
+      <div class="wrap">
+        <h2 class="section-title">Fifteen ways a team <span>could use it.</span></h2>
+        <div class="disclosure">Fictional examples only. These are not customer reviews, testimonials, purchasers or measured outcomes.</div>
+        <div class="personas">
+          <div class="persona"><b>01 • US ecommerce ops</b><br>Unifies web chat and support email.</div>
+          <div class="persona"><b>02 • UK retailer</b><br>Uses UK dates, currency and spelling.</div>
+          <div class="persona"><b>03 • US bilingual care</b><br>Offers English and US Spanish web chat.</div>
+          <div class="persona"><b>04 • UK SaaS success</b><br>Escalates onboarding questions.</div>
+          <div class="persona"><b>05 • US ecommerce agency</b><br>Separates client tenants and knowledge.</div>
+          <div class="persona"><b>06 • UK service desk</b><br>Assigns and takes over conversations.</div>
+          <div class="persona"><b>07 • US knowledge manager</b><br>Loads approved PDF and Office files.</div>
+          <div class="persona"><b>08 • UK accessibility lead</b><br>Runs keyboard and assistive-tech tests.</div>
+          <div class="persona"><b>09 • US CX analyst</b><br>Finds gaps with CSAT and queue data.</div>
+          <div class="persona"><b>10 • UK privacy ops</b><br>Uses export and approved deletion flows.</div>
+          <div class="persona"><b>11 • US help-desk lead</b><br>Protects account tools with step-up identity.</div>
+          <div class="persona"><b>12 • UK managed services</b><br>Keeps hosting and credentials in-house.</div>
+          <div class="persona"><b>13 • US social support</b><br>Routes configured channels to one queue.</div>
+          <div class="persona"><b>14 • UK support engineer</b><br>Uses diagnostics and recovery runbooks.</div>
+          <div class="persona"><b>15 • US support director</b><br>Measures Ollama before choosing deployment.</div>
+        </div>
+        <p><a href="illustrative-use-cases.md">Read the full fictional use-case descriptions and limitations.</a></p>
+      </div>
+    </section>
+
+    <section id="buy">
+      <div class="wrap buy">
+        <p class="eyebrow">FrontDesk package</p>
+        <h2 class="section-title" style="margin-inline:auto">Self-hosted support workflow for US and UK teams.</h2>
+        <p class="price">From $299 USD</p>
+        <p>One-time purchase. Review each plan, the terms, and the refund policy before purchase.</p>
+        <a class="button secondary" href="https://www.paypal.com/ncp/payment/D973WXW3HCZ9E">Solo — $299</a>
+        <a class="button primary" href="https://www.paypal.com/ncp/payment/9SDPW2BCLUB44">Shop — $699</a>
+        <a class="button secondary" href="https://www.paypal.com/ncp/payment/6EVAGLWEC77EL">Multi — $1,199</a>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">
+      <p><strong>Seller:</strong> ShellieSoftwareTools, operated by Hiroshi Aoki.<br><strong>US mailing address (CMRA):</strong> 444 Alaska Avenue, Suite #CPT315, Torrance, CA 90503, USA.</p>
+      <p><a href="legal/terms-of-sale-and-eula.md">Terms and EULA</a> · <a href="legal/refund-dispute-policy.md">Refund policy</a> · <a href="legal/buyer-privacy-notice.md">Privacy notice</a> · <a href="customer-guide.md">Full customer guide</a></p>
+      <p>FrontDesk is not represented as endorsed or certified by any named connector platform. Integration availability depends on purchaser-owned accounts, credentials and platform approval.</p>
+    </div>
+  </footer>
+</body>
+</html>

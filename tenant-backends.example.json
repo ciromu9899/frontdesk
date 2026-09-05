@@ -1,0 +1,22 @@
+{
+  "tenants": {
+    "customer-a": {
+      "base_url": "https://api.customer-a.example",
+      "token_env": "FRONTDESK_CUSTOMER_A_BACKEND_TOKEN",
+      "timeout": 10,
+      "max_retries": 2,
+      "retry_base_delay": 0.25,
+      "circuit_failure_threshold": 5,
+      "circuit_recovery_timeout": 30
+    },
+    "customer-b": {
+      "base_url": "https://api.customer-b.example",
+      "token_env": "FRONTDESK_CUSTOMER_B_BACKEND_TOKEN",
+      "timeout": 10,
+      "max_retries": 2,
+      "retry_base_delay": 0.25,
+      "circuit_failure_threshold": 5,
+      "circuit_recovery_timeout": 30
+    }
+  }
+}

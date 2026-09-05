@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "frontdesk"
+version = "1.7.0"
+description = "A tenant-isolated AI support bot for GitHub Issues and Discussions."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Paul Tyrone", email = "hello@shelliecom.com" }]
+keywords = ["customer-support", "ai-agent", "github", "issues", "discussions", "chatbot"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Communications :: Chat",
+    "Topic :: Office/Business",
+]
+
+# The core runs on the standard library alone. Everything below is optional
+# so that evaluating Frontdesk never requires installing anything.
+dependencies = ["defusedxml>=0.7.1,<1", "pypdf>=6.16.1,<7"]
+
+[project.optional-dependencies]
+# Adaptive thinking with an explicit display needs a recent SDK; this
+# matches requirements.txt.
+anthropic = ["anthropic>=0.85.0"]
+quality = ["playwright>=1.62.0,<2"]
+
+[project.urls]
+Homepage = "https://github.com/ciromu9899/frontdesk"
+Documentation = "https://github.com/ciromu9899/frontdesk/blob/main/docs/github-support.md"
+Issues = "https://github.com/ciromu9899/frontdesk/issues"
+
+[project.scripts]
+frontdesk = "chat:main"
+frontdesk-desktop = "desktop:main"
+frontdesk-server = "server:main"
+frontdesk-github = "github_bot:main"
+
+[tool.setuptools]
+py-modules = [
+    "chat", "providers", "tools", "connectors", "integrations",
+    "auth", "audit", "rag", "admin", "doctor", "i18n", "config",
+    "linkedin_verify", "webhooks", "mobile", "approvals", "handoffs",
+    "state", "webchat", "privacy", "feedback", "email_mailbox", "evaluate",
+    "rescore_evaluation", "load_test", "resilience", "external_api_load_test",
+    "disaster_recovery", "accessibility_check", "verify_channels_live",
+    "salon_reminders", "quickstart", "local_ai", "desktop", "server", "github_bot",
+]
+packages = ["channels"]
+
+[tool.setuptools.package-data]
+"*" = ["personas/*.md", "knowledge/*.md"]

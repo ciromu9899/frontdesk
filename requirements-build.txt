@@ -1,0 +1,2 @@
+# Build-machine dependency only. It is not required on customer computers.
+pyinstaller==6.22.2

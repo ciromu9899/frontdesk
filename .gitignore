@@ -1,0 +1,31 @@
+# Real credentials. .env.example is the one that ships.
+.env
+
+# Runtime state: the demo store, the audit log, the knowledge index. All three
+# are regenerated on demand, and the audit log is a customer record.
+data/
+
+# Saved conversations
+transcript-*.json
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.build-cache/
+test-artifacts/
+windows-build/
+windows-dist/
+.venv/
+venv/
+
+# Internal and counsel-review material. These remain local and must not enter
+# the public GitHub history until separately approved for publication.
+docs/legal/
+docs/legal-risk-register.md
+docs/compliance-readiness.md
+docs/marketing-outreach.md
+docs/sales-operations.md
+docs/social-campaign.md

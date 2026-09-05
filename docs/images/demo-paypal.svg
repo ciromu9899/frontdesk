@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="566" viewBox="0 0 1000 566" font-family="Consolas, 'DejaVu Sans Mono', monospace">
+<rect x="0" y="0" width="1000" height="566" rx="10" fill="#0d1117" stroke="#30363d"/>
+<line x1="0" y1="38" x2="1000" y2="38" stroke="#30363d"/>
+<circle cx="20" cy="19" r="5.5" fill="#ff5f56"/>
+<circle cx="38" cy="19" r="5.5" fill="#ffbd2e"/>
+<circle cx="56" cy="19" r="5.5" fill="#27c93f"/>
+<text x="500.0" y="23" text-anchor="middle" font-size="12" fill="#8b949e">frontdesk — PayPal checkout, charged only after approval</text>
+<text x="22" y="72" font-size="14" fill="#e6edf3" font-weight="400" xml:space="preserve">$ frontdesk --persona ecommerce</text>
+<text x="22" y="94" font-size="14" fill="#c9d1d9" font-weight="400" xml:space="preserve"></text>
+<text x="22" y="116" font-size="14" fill="#6e7681" font-weight="400" xml:space="preserve">— anthropic / claude-opus-5 / effort=medium / tools=10 / persona=ecommerce</text>
+<text x="22" y="138" font-size="14" fill="#6e7681" font-weight="400" xml:space="preserve">— /help for commands, /exit to quit</text>
+<text x="22" y="160" font-size="14" fill="#c9d1d9" font-weight="400" xml:space="preserve"></text>
+<text x="22" y="182" font-size="14" fill="#4ec9d9" font-weight="700" xml:space="preserve">You&gt; I'd like to buy the standing desk converter</text>
+<text x="22" y="204" font-size="14" fill="#8b949e" font-weight="400" xml:space="preserve">  [tool] create_paypal_order({"amount": "189.50", "description": "Standing desk converter", "reference_id": "IN…</text>
+<text x="22" y="226" font-size="14" fill="#8b949e" font-weight="400" xml:space="preserve">  [result] {"order_id": "5O190127TN364715T", "status": "CREATED", "amount": "189.50", "currency": "USD", "appro…</text>
+<text x="22" y="248" font-size="14" fill="#c9d1d9" font-weight="400" xml:space="preserve"></text>
+<text x="22" y="270" font-size="14" fill="#5ed97a" font-weight="700" xml:space="preserve">Bot&gt; That's $189.50. Approve on PayPal, then tell me when you're done:</text>
+<text x="22" y="292" font-size="14" fill="#5ed97a" font-weight="700" xml:space="preserve">https://www.sandbox.paypal.com/checkoutnow?token=5O190127TN364715T</text>
+<text x="22" y="314" font-size="14" fill="#c9d1d9" font-weight="400" xml:space="preserve"></text>
+<text x="22" y="336" font-size="14" fill="#4ec9d9" font-weight="700" xml:space="preserve">You&gt; approved it</text>
+<text x="22" y="358" font-size="14" fill="#8b949e" font-weight="400" xml:space="preserve">  [tool] get_paypal_order_status({"order_id": "5O190127TN364715T"})</text>
+<text x="22" y="380" font-size="14" fill="#8b949e" font-weight="400" xml:space="preserve">  [result] {"order_id": "5O190127TN364715T", "status": "APPROVED", "purchase_units": [{"amount": {"currency_cod…</text>
+<text x="22" y="402" font-size="14" fill="#c9d1d9" font-weight="400" xml:space="preserve"></text>
+<text x="22" y="424" font-size="14" fill="#e3b341" font-weight="400" xml:space="preserve">  [confirm] Charge PayPal order 5O190127TN364715T (money moves now)</text>
+<text x="22" y="446" font-size="14" fill="#e3b341" font-weight="400" xml:space="preserve">  Run this? [y/N] y</text>
+<text x="22" y="468" font-size="14" fill="#8b949e" font-weight="400" xml:space="preserve">  [tool] Charge PayPal order 5O190127TN364715T (money moves now)</text>
+<text x="22" y="490" font-size="14" fill="#8b949e" font-weight="400" xml:space="preserve">  [result] {"order_id": "5O190127TN364715T", "status": "COMPLETED", "captures": [{"capture_id": "3C679366HH9089…</text>
+<text x="22" y="512" font-size="14" fill="#c9d1d9" font-weight="400" xml:space="preserve"></text>
+<text x="22" y="534" font-size="14" fill="#5ed97a" font-weight="700" xml:space="preserve">Bot&gt; Charged $189.50. Capture ID 3C679366HH908993F — you'll see "PAYPAL *DESKCO" on your statement.</text>
+</svg>

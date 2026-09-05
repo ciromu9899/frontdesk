@@ -1,0 +1,29 @@
+services:
+  frontdesk:
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - "${FRONTDESK_BIND_ADDRESS:-127.0.0.1}:${FRONTDESK_WEB_PORT:-8766}:8766"
+      - "${FRONTDESK_ADMIN_BIND_ADDRESS:-127.0.0.1}:${FRONTDESK_ADMIN_PORT:-8765}:8765"
+    environment:
+      FRONTDESK_AUTH_SECRET: "${FRONTDESK_AUTH_SECRET:-}"
+      FRONTDESK_FEEDBACK_SECRET: "${FRONTDESK_FEEDBACK_SECRET:-}"
+      FRONTDESK_DATA_DIR: /var/lib/frontdesk
+      FRONTDESK_REGION: "${FRONTDESK_REGION:-us}"
+      FRONTDESK_INDUSTRY: "${FRONTDESK_INDUSTRY:-salon}"
+      FRONTDESK_WEB_PERSONA: "${FRONTDESK_WEB_PERSONA:-salon}"
+      FRONTDESK_WEB_PROVIDER: "${FRONTDESK_WEB_PROVIDER:-echo}"
+      FRONTDESK_WEB_TENANT_ID: "${FRONTDESK_WEB_TENANT_ID:-salon:default}"
+      FRONTDESK_MULTI_TENANT_KNOWLEDGE: "1"
+      FRONTDESK_SECURE_COOKIES: "${FRONTDESK_SECURE_COOKIES:-0}"
+      FRONTDESK_EMBED_ORIGINS: "${FRONTDESK_EMBED_ORIGINS:-'self'}"
+      OLLAMA_BASE_URL: "${OLLAMA_BASE_URL:-http://host.docker.internal:11434}"
+      OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen3:8b}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - frontdesk-data:/var/lib/frontdesk
+
+volumes:
+  frontdesk-data:

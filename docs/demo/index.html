@@ -1,0 +1,974 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frontdesk Checkout</title>
+<style>
+  /* ---------- tokens: light is the base, both themes defined at token level ---------- */
+  :root {
+    --ground: #F2F4F2;
+    --surface: #FFFFFF;
+    --surface-2: #E8ECEA;
+    --line: #D5DCD9;
+    --line-soft: #E4EAE7;
+    --ink: #0E1A18;
+    --ink-2: #445652;
+    --ink-3: #788985;
+    --petrol: #0D5B58;
+    --petrol-soft: #E3EFEE;
+    --petrol-on: #FFFFFF;
+    --brass: #8A6212;
+    --brass-soft: #FAF2DF;
+    --brass-line: #D3A94E;
+    --brass-on: #FFFFFF;
+    --sage: #26654A;
+    --sage-soft: #E6F1EB;
+    --shadow: 0 1px 2px rgba(14, 26, 24, .06), 0 12px 28px -18px rgba(14, 26, 24, .35);
+
+    --font-ui: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+      "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "Cascadia Mono", Consolas, ui-monospace, "SF Mono",
+      "Liberation Mono", monospace;
+    --font-brand: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 16px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0B1211;
+      --surface: #121C1A;
+      --surface-2: #182422;
+      --line: #24322F;
+      --line-soft: #1C2825;
+      --ink: #E8EFEC;
+      --ink-2: #A0B2AD;
+      --ink-3: #72847F;
+      --petrol: #4EB5AE;
+      --petrol-soft: #13302E;
+      --petrol-on: #06201F;
+      --brass: #E3B341;
+      --brass-soft: #241D0E;
+      --brass-line: #6E5A22;
+      --brass-on: #1A1405;
+      --sage: #5BB98A;
+      --sage-soft: #0F2419;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 14px 30px -18px rgba(0, 0, 0, .8);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0B1211;
+    --surface: #121C1A;
+    --surface-2: #182422;
+    --line: #24322F;
+    --line-soft: #1C2825;
+    --ink: #E8EFEC;
+    --ink-2: #A0B2AD;
+    --ink-3: #72847F;
+    --petrol: #4EB5AE;
+    --petrol-soft: #13302E;
+    --petrol-on: #06201F;
+    --brass: #E3B341;
+    --brass-soft: #241D0E;
+    --brass-line: #6E5A22;
+    --brass-on: #1A1405;
+    --sage: #5BB98A;
+    --sage-soft: #0F2419;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 14px 30px -18px rgba(0, 0, 0, .8);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--petrol);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+
+  .wordmark {
+    font-family: var(--font-brand);
+    font-size: 22px;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  .wordmark span { color: var(--petrol); }
+
+  .storenav {
+    display: flex;
+    gap: 22px;
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+
+  .demo-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 11px;
+    border: 1px solid var(--brass-line);
+    background: var(--brass-soft);
+    color: var(--brass);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .demo-flag::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--brass);
+  }
+
+  /* ---------- layout ---------- */
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 428px;
+    gap: 0;
+    align-items: stretch;
+    min-height: calc(100vh - 61px);
+  }
+
+  /* ---------- storefront ---------- */
+  .store { padding: 40px 44px 56px; min-width: 0; }
+
+  .crumbs { font-size: 12.5px; color: var(--ink-3); margin-bottom: 26px; }
+  .crumbs b { color: var(--ink-2); font-weight: 500; }
+
+  .product {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+  }
+
+  .shot {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    aspect-ratio: 4 / 3;
+    display: grid;
+    place-items: center;
+  }
+  .shot svg { width: 100%; height: 100%; }
+
+  h1 {
+    font-size: 30px;
+    line-height: 1.15;
+    letter-spacing: -.02em;
+    margin: 10px 0 6px;
+    text-wrap: balance;
+  }
+
+  .price {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 24px;
+    color: var(--ink);
+    margin: 14px 0 4px;
+  }
+  .stock { font-size: 13px; color: var(--sage); font-weight: 600; }
+
+  .blurb { color: var(--ink-2); margin: 18px 0 22px; max-width: 46ch; }
+
+  .specs {
+    list-style: none;
+    margin: 0 0 26px;
+    padding: 0;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .specs li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 13.5px;
+  }
+  .specs dt, .specs .k { color: var(--ink-3); }
+  .specs .v { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  .buyrow { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+  .btn {
+    font: inherit;
+    font-weight: 600;
+    border-radius: var(--r-md);
+    border: 1px solid transparent;
+    padding: 11px 20px;
+    cursor: pointer;
+    /* Only filter and transform are transitioned. Transitioning a colour that
+       comes from a custom property leaves it frozen on the old value when the
+       theme changes, so colour changes land immediately and the sense of
+       response comes from filter instead. */
+    transition: filter .15s ease, transform .1s ease;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background-color: var(--petrol); color: var(--petrol-on); }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--ink-2);
+    border-color: var(--line);
+  }
+  .btn-ghost:hover { background-color: var(--surface-2); }
+  .btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .btn[disabled]:active { transform: none; }
+
+  .hint { font-size: 12.5px; color: var(--ink-3); }
+
+  /* ---------- chat panel ---------- */
+  .panel {
+    background: var(--surface);
+    border-left: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 61px);
+    min-width: 0;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mark {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--petrol);
+    color: var(--petrol-on);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex: none;
+  }
+
+  .panel-head .who { font-weight: 650; font-size: 14.5px; line-height: 1.2; }
+  .panel-head .state {
+    font-size: 12px;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--sage);
+    flex: none;
+  }
+
+  .replay {
+    margin-left: auto;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .replay:hover { background: var(--surface-2); }
+
+  .thread {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+  }
+
+  .msg {
+    max-width: 86%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14.2px;
+    line-height: 1.5;
+    animation: rise .26s ease both;
+  }
+  .msg.agent {
+    background: var(--surface-2);
+    color: var(--ink);
+    border-bottom-left-radius: 5px;
+    align-self: flex-start;
+  }
+  .msg.user {
+    background: var(--petrol);
+    color: var(--petrol-on);
+    border-bottom-right-radius: 5px;
+    align-self: flex-end;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* tool activity — the machinery, shown honestly */
+  .tool {
+    align-self: stretch;
+    display: flex;
+    gap: 9px;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: 11.8px;
+    color: var(--ink-3);
+    padding: 5px 10px 5px 9px;
+    border-left: 2px solid var(--line);
+    background: var(--ground);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    animation: rise .2s ease both;
+    overflow-wrap: anywhere;
+  }
+  .tool .verb { color: var(--petrol); font-weight: 600; flex: none; }
+  .tool.ok .verb { color: var(--sage); }
+  .tool.gate { border-left-color: var(--brass-line); }
+  .tool.gate .verb { color: var(--brass); }
+
+  .typing {
+    align-self: flex-start;
+    display: flex;
+    gap: 4px;
+    padding: 12px 15px;
+    background: var(--surface-2);
+    border-radius: 14px 14px 14px 5px;
+  }
+  .typing i {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ink-3);
+    animation: blink 1.2s infinite ease-in-out;
+  }
+  .typing i:nth-child(2) { animation-delay: .18s; }
+  .typing i:nth-child(3) { animation-delay: .36s; }
+  @keyframes blink {
+    0%, 60%, 100% { opacity: .3; }
+    30% { opacity: 1; }
+  }
+
+  /* confirmation gate — the one moment money can move */
+  .gate {
+    align-self: stretch;
+    border: 1.5px solid var(--brass-line);
+    background: var(--brass-soft);
+    border-radius: var(--r-md);
+    padding: 15px 16px 14px;
+    animation: rise .26s ease both;
+  }
+  .gate .cap {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--brass);
+  }
+  .gate .amount {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 26px;
+    letter-spacing: -.02em;
+    margin: 8px 0 2px;
+    color: var(--ink);
+  }
+  .gate .what { font-size: 13.2px; color: var(--ink-2); }
+  .gate .ref {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-3);
+    margin-top: 8px;
+    overflow-wrap: anywhere;
+  }
+  .gate .acts { display: flex; gap: 9px; margin-top: 14px; }
+  .gate .acts .btn { padding: 9px 16px; font-size: 13.5px; }
+  .btn-pay { background-color: var(--brass); color: var(--brass-on); }
+  .btn-pay:hover { filter: brightness(1.06); }
+
+  /* choices */
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 20px 4px;
+  }
+  .choice {
+    font: inherit;
+    font-size: 13.8px;
+    text-align: left;
+    background-color: transparent;
+    color: var(--petrol);
+    border: 1px solid var(--petrol);
+    border-radius: 999px;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: filter .15s ease;
+  }
+  .choice:hover { background-color: var(--petrol-soft); }
+
+  .composer {
+    border-top: 1px solid var(--line);
+    padding: 14px 20px 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .fakefield {
+    flex: 1;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 16px;
+    color: var(--ink-3);
+    font-size: 13.5px;
+    background: var(--ground);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .send {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-2);
+    color: var(--ink-3);
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+
+  /* simulated payment provider step */
+  .provider {
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    padding: 28px;
+    animation: rise .22s ease both;
+    z-index: 3;
+  }
+  .provider .sim {
+    align-self: flex-start;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    border: 1px dashed var(--line);
+    border-radius: var(--r-sm);
+    padding: 4px 9px;
+  }
+  .provider h2 {
+    font-size: 19px;
+    margin: 4px 0 0;
+    letter-spacing: -.01em;
+  }
+  .provider p { color: var(--ink-2); font-size: 13.8px; margin: 0; }
+  .provider .lockline {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--sage-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .provider .lockline svg { flex: none; margin-top: 2px; }
+  .provider .total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    margin-top: 4px;
+  }
+  .provider .total .v {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 22px;
+  }
+
+  .panel-body { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+  /* outcome banner under the thread */
+  .outcome {
+    align-self: stretch;
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    font-size: 13.4px;
+    animation: rise .26s ease both;
+    border: 1px solid var(--line-soft);
+  }
+  .outcome.paid { background: var(--sage-soft); border-color: var(--sage); color: var(--ink); }
+  .outcome.held { background: var(--surface-2); color: var(--ink-2); }
+  .outcome b { font-weight: 650; }
+
+
+  /* ---------- colophon: steps outside the demo fiction ---------- */
+  .colophon {
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    padding: 44px 44px 56px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 44px;
+    align-items: start;
+  }
+  .colophon h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 12px;
+  }
+  .colophon p {
+    margin: 0 0 12px;
+    color: var(--ink-2);
+    font-size: 13.8px;
+    max-width: 58ch;
+  }
+  .colophon p:last-child { margin-bottom: 0; }
+  .colophon .maker {
+    font-family: var(--font-brand);
+    font-size: 19px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .colophon .cred {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+  .colophon strong { color: var(--ink); font-weight: 650; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      transition-duration: .001ms !important;
+    }
+    .thread { scroll-behavior: auto; }
+  }
+
+  @media (max-width: 1020px) {
+    .shell { grid-template-columns: 1fr; min-height: 0; }
+    .panel {
+      position: static;
+      height: 620px;
+      border-left: none;
+      border-top: 1px solid var(--line);
+      order: -1;
+    }
+    .colophon { grid-template-columns: 1fr; gap: 32px; padding: 36px 24px 44px; }
+    .store { padding: 32px 24px 48px; }
+    .product { grid-template-columns: 1fr; gap: 28px; }
+    .topbar { padding: 12px 20px; }
+    .storenav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wordmark">Desk<span>Co</span></div>
+  <nav class="storenav" aria-label="Store">
+    <span>Desks</span><span>Risers</span><span>Seating</span><span>Accessories</span>
+  </nav>
+  <span class="demo-flag">Interactive demo — no real payment is taken</span>
+</header>
+
+<div class="shell">
+  <main class="store">
+    <div class="crumbs">Risers <span aria-hidden="true">›</span> <b>Standing Desk Converter</b></div>
+
+    <div class="product">
+      <div class="shot">
+        <!-- standing desk converter, drawn rather than photographed -->
+        <svg viewBox="0 0 320 240" role="img" aria-label="Standing desk converter shown at raised height">
+          <g fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round">
+            <path d="M20 214h280" stroke="var(--line)" stroke-width="3"/>
+            <path d="M52 196h216" />
+            <path d="M66 196v10M254 196v10" stroke="var(--line)"/>
+            <path d="M74 196l84-56M242 196l-84-56" stroke="var(--petrol)"/>
+            <path d="M74 140l84 56M242 140l-84 56" stroke="var(--petrol)"/>
+            <path d="M66 140h188" />
+            <rect x="108" y="60" width="104" height="66" rx="4" stroke="var(--ink-2)"/>
+            <path d="M160 126v10M140 136h40" stroke="var(--ink-2)"/>
+            <rect x="88" y="146" width="144" height="9" rx="3" stroke="var(--line)"/>
+          </g>
+          <circle cx="158" cy="140" r="4" fill="var(--brass)"/>
+        </svg>
+      </div>
+
+      <div>
+        <div class="eyebrow">DeskCo Originals</div>
+        <h1>Standing Desk Converter</h1>
+        <div class="price">$189.50</div>
+        <div class="stock">In stock — ships in 2 business days</div>
+        <p class="blurb">
+          A counterweighted riser that lifts a monitor and keyboard together in one
+          motion. Sits on the desk you already own.
+        </p>
+        <ul class="specs">
+          <li><span class="k">Lift range</span><span class="v">4.5–19.5 in</span></li>
+          <li><span class="k">Work surface</span><span class="v">35 × 22 in</span></li>
+          <li><span class="k">Capacity</span><span class="v">35 lb</span></li>
+          <li><span class="k">Warranty</span><span class="v">5 years</span></li>
+        </ul>
+        <div class="buyrow">
+          <button class="btn btn-primary" type="button" disabled>Add to cart</button>
+          <span class="hint">Or ask the front desk to order it for you →</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="panel" aria-label="Frontdesk support chat">
+    <div class="panel-head">
+      <div class="mark" aria-hidden="true">F</div>
+      <div>
+        <div class="who">DeskCo Front Desk</div>
+        <div class="state"><span class="dot"></span> Online — answers in seconds</div>
+      </div>
+      <button class="replay" type="button" id="replay">Restart</button>
+    </div>
+
+    <div class="panel-body">
+      <div class="thread" id="thread" role="log" aria-live="polite" aria-label="Conversation"></div>
+      <div class="choices" id="choices"></div>
+      <div class="composer">
+        <div class="fakefield" id="field">Pick a reply above to continue</div>
+        <button class="send" type="button" aria-label="Send" disabled>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div id="provider-slot"></div>
+    </div>
+  </aside>
+</div>
+
+
+<footer class="colophon">
+  <div>
+    <h3>About this demo</h3>
+    <p>
+      DeskCo is a fictional store, built to show Frontdesk somewhere recognizable.
+      The storefront is a mockup — the agent's behavior is not. The tool calls, the
+      approval step, and the refusal to charge without a yes are how the product
+      actually works.
+    </p>
+    <p>
+      No payment is taken on this page, and no card details are collected anywhere
+      on it. The payment step is drawn as a placeholder because, in the real
+      product, that screen belongs to the payment provider and never to us.
+    </p>
+  </div>
+  <div>
+    <h3>Built by</h3>
+    <div class="maker">Paul Tyrone</div>
+    <div class="cred">
+      Founder, Shellie Software Tools · Ph.D. in Engineering,
+      Information Engineering, Tokyo Institute of Technology, 2004
+    </div>
+    <p>
+      An information-systems engineering firm working on information infrastructure
+      and information systems since 2004. The doctorate behind it certifies, among
+      other things, the ability to evaluate a field of expertise objectively — from
+      broad societal perspectives in addition to technical ones.
+    </p>
+    <p>
+      <strong>That is the discipline behind the one decision this demo exists to
+      show:</strong> an agent that acts has to first be an agent that stops.
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    "use strict";
+
+    const thread = document.getElementById("thread");
+    const choices = document.getElementById("choices");
+    const field = document.getElementById("field");
+    const providerSlot = document.getElementById("provider-slot");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const ORDER_ID = "5O190127TN364715T";
+    const CAPTURE_ID = "3C679366HH908993F";
+
+    const wait = (ms) => new Promise((r) => setTimeout(r, reduced ? 0 : ms));
+    const scroll = () => { thread.scrollTop = thread.scrollHeight; };
+
+    function el(tag, cls, text) {
+      const node = document.createElement(tag);
+      if (cls) node.className = cls;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    function message(who, text) {
+      const node = el("div", "msg " + who, text);
+      thread.appendChild(node);
+      scroll();
+    }
+
+    function tool(verb, detail, kind) {
+      const row = el("div", "tool" + (kind ? " " + kind : ""));
+      row.appendChild(el("span", "verb", verb));
+      row.appendChild(el("span", null, detail));
+      thread.appendChild(row);
+      scroll();
+    }
+
+    async function typing(ms) {
+      const node = el("div", "typing");
+      node.append(el("i"), el("i"), el("i"));
+      thread.appendChild(node);
+      scroll();
+      await wait(ms);
+      node.remove();
+    }
+
+    function offer(options) {
+      choices.replaceChildren();
+      options.forEach((option) => {
+        const button = el("button", "choice", option.label);
+        button.type = "button";
+        button.addEventListener("click", () => {
+          choices.replaceChildren();
+          message("user", option.label);
+          option.run();
+        });
+        choices.appendChild(button);
+      });
+      field.textContent = "Pick a reply above to continue";
+    }
+
+    function outcome(kind, html) {
+      const node = el("div", "outcome " + kind);
+      node.innerHTML = html;
+      thread.appendChild(node);
+      scroll();
+    }
+
+    /* ---------- the demo script ---------- */
+
+    async function start() {
+      thread.replaceChildren();
+      choices.replaceChildren();
+      providerSlot.replaceChildren();
+      await typing(500);
+      message("agent",
+        "Hi — I'm the DeskCo front desk. I can check an order, or set a new one up for you.");
+      offer([
+        { label: "I'd like to order the standing desk converter", run: buy },
+        { label: "Where's my order A-88001?", run: lookup },
+      ]);
+    }
+
+    async function lookup() {
+      await wait(320);
+      tool("get_order_status", '{"order_id": "A-88001"}');
+      await wait(560);
+      tool("result", '"In transit" · eta 2026-08-21 · $249.00 USD', "ok");
+      await typing(700);
+      message("agent",
+        "Your noise-cancelling headphones are in transit — arriving Friday 08/21. " +
+        "Anything else I can pull up?");
+      offer([{ label: "Yes — order the standing desk converter too", run: buy }]);
+    }
+
+    async function buy() {
+      await typing(760);
+      message("agent",
+        "The Standing Desk Converter is $189.50, in stock, ships in 2 business days. " +
+        "Want me to set up the payment?");
+      offer([
+        { label: "Yes, go ahead", run: createOrder },
+        { label: "Not right now", run: backOff },
+      ]);
+    }
+
+    async function backOff() {
+      await typing(520);
+      message("agent",
+        "No problem — nothing has been charged. I'll be here if you change your mind.");
+      offer([{ label: "Actually, let's do it", run: createOrder }]);
+    }
+
+    async function createOrder() {
+      await wait(340);
+      tool("create_paypal_order", '{"amount": "189.50", "reference_id": "INV-4471"}');
+      await wait(620);
+      tool("result", '"CREATED" · order ' + ORDER_ID + " · approval link issued", "ok");
+      await typing(680);
+      message("agent",
+        "Ready. Approve the payment with PayPal and I'll finish the order. " +
+        "Nothing is charged until you confirm.");
+      offer([{ label: "Open the payment page", run: showProvider }]);
+    }
+
+    function showProvider() {
+      const panel = el("div", "provider");
+      panel.innerHTML =
+        '<span class="sim">Simulated payment step</span>' +
+        "<h2>Approve this payment</h2>" +
+        "<p>In the real product this is your payment provider's own hosted page. " +
+        "Frontdesk hands off here and waits.</p>" +
+        '<div class="lockline">' +
+          '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">' +
+            '<rect x="3" y="7" width="10" height="7" rx="2" stroke="currentColor" ' +
+            'stroke-width="1.6"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" ' +
+            'stroke-width="1.6" stroke-linecap="round"/></svg>' +
+          "<span>Card details are entered here, on the provider's page. They are never " +
+          "sent to Frontdesk, so they never enter the conversation or its logs.</span>" +
+        "</div>" +
+        '<div class="total"><span>Total due</span><span class="v">$189.50</span></div>';
+
+      const row = el("div", "gate-acts");
+      row.style.display = "flex";
+      row.style.gap = "10px";
+      const approve = el("button", "btn btn-primary", "Approve payment");
+      approve.type = "button";
+      const cancel = el("button", "btn btn-ghost", "Cancel");
+      cancel.type = "button";
+      row.append(approve, cancel);
+      panel.appendChild(row);
+      providerSlot.appendChild(panel);
+      approve.focus();
+
+      approve.addEventListener("click", () => { panel.remove(); afterApproval(); });
+      cancel.addEventListener("click", () => { panel.remove(); providerCancelled(); });
+    }
+
+    async function providerCancelled() {
+      await typing(520);
+      message("agent",
+        "You closed the payment page, so the order is still unpaid. Nothing was charged.");
+      offer([{ label: "Try the payment again", run: showProvider }]);
+    }
+
+    async function afterApproval() {
+      await wait(360);
+      tool("get_paypal_order_status", '{"order_id": "' + ORDER_ID + '"}');
+      await wait(620);
+      tool("result", '"APPROVED" · $189.50 USD · not yet captured', "ok");
+      await typing(620);
+      message("agent",
+        "PayPal has your approval. One last check before I charge it:");
+      gate();
+    }
+
+    function gate() {
+      const card = el("div", "gate");
+      card.innerHTML =
+        '<div class="cap">Confirm before charging</div>' +
+        '<div class="amount">$189.50</div>' +
+        '<div class="what">Standing Desk Converter · DeskCo Originals</div>' +
+        '<div class="ref">capture_paypal_order · order ' + ORDER_ID + "</div>";
+      const acts = el("div", "acts");
+      const pay = el("button", "btn btn-pay", "Charge $189.50");
+      pay.type = "button";
+      const no = el("button", "btn btn-ghost", "Not yet");
+      no.type = "button";
+      acts.append(pay, no);
+      card.appendChild(acts);
+      thread.appendChild(card);
+      scroll();
+      pay.focus();
+
+      pay.addEventListener("click", () => { acts.remove(); charge(); });
+      no.addEventListener("click", () => { acts.remove(); declined(); });
+    }
+
+    async function charge() {
+      await wait(340);
+      tool("capture_paypal_order", "money moves now", "gate");
+      await wait(760);
+      tool("result", '"COMPLETED" · capture ' + CAPTURE_ID, "ok");
+      await typing(720);
+      message("agent",
+        "Charged $189.50. Your converter ships Wednesday — I've emailed the receipt " +
+        "and tracking will follow.");
+      outcome("paid",
+        "<b>Order placed.</b> The charge ran once, after your explicit yes. " +
+        "The request carried an idempotency key, so a retry would return this same " +
+        "capture rather than charging again.");
+      offer([{ label: "Start over", run: start }]);
+    }
+
+    async function declined() {
+      await wait(300);
+      tool("capture_paypal_order", "declined by user — not executed", "gate");
+      await typing(640);
+      message("agent",
+        "Understood — I haven't charged anything. The approval is still valid, so " +
+        "say the word and I'll finish it.");
+      outcome("held",
+        "<b>Nothing moved.</b> Without a yes, the charge is never sent. The agent is " +
+        "told it was declined, so it cannot report the order as paid.");
+      offer([
+        { label: "Go ahead and charge it", run: () => { gate(); } },
+        { label: "Start over", run: start },
+      ]);
+    }
+
+    document.getElementById("replay").addEventListener("click", start);
+    start();
+  })();
+</script>
+</body>
+</html>

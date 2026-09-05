@@ -1,0 +1,27 @@
+name: FrontDesk GitHub Support Bot
+description: Answer GitHub Issues and Discussions with approved project knowledge.
+author: ShellieSoftwareTools
+inputs:
+  provider:
+    description: FrontDesk model provider (openai, anthropic, ollama, or echo).
+    required: false
+    default: auto
+  persona:
+    description: FrontDesk persona name.
+    required: false
+    default: github-support
+runs:
+  using: composite
+  steps:
+    - name: Install FrontDesk
+      shell: bash
+      run: python -m pip install "${{ github.action_path }}"
+    - name: Answer the GitHub support event
+      shell: bash
+      env:
+        FRONTDESK_GITHUB_PROVIDER: ${{ inputs.provider }}
+        FRONTDESK_GITHUB_PERSONA: ${{ inputs.persona }}
+      run: python "${{ github.action_path }}/github_bot.py"
+branding:
+  icon: message-circle
+  color: blue
