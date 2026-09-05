@@ -282,9 +282,8 @@ distribution and rollback are covered by
 [`docs/release-signing.md`](docs/release-signing.md).
 
 Real model evaluation requires a configured provider. Live channel checks
-use `python verify_channels_live.py`. Compliance readiness evidence is documented
-in [docs/compliance-readiness.md](docs/compliance-readiness.md); it is not a legal
-certification.
+use `python verify_channels_live.py`. FrontDesk does not claim legal certification;
+internal compliance and counsel-review materials are intentionally not published.
 
 ## Where to go next
 
@@ -293,15 +292,12 @@ certification.
 | Deploy it, connect Slack/Meta, wire up real systems, load knowledge | [docs/customer-guide.md](docs/customer-guide.md) |
 | Follow the visual setup and daily shared-inbox workflow | [docs/ease-of-use.html](docs/ease-of-use.html) |
 | Review 15 clearly fictional customer workflow examples | [docs/illustrative-use-cases.md](docs/illustrative-use-cases.md) |
-| Prepare compliant US/UK business outreach | [docs/marketing-outreach.md](docs/marketing-outreach.md) |
-| Prepare truthful X and Instagram creative | [docs/social-campaign.md](docs/social-campaign.md) |
+| Configure GitHub Issues and Discussions | [docs/github-support.md](docs/github-support.md) |
 | Look up an option, tool, role or environment variable | [docs/reference.md](docs/reference.md) |
 | Read the product description written for customers | [docs/product-en.md](docs/product-en.md) |
 | Configure the salon and wellness industry pack | [docs/salon-setup.md](docs/salon-setup.md) |
 | See why it is built this way | [docs/design-notes.md](docs/design-notes.md) |
 | Separate Shellie, customer, PayPal and social-network data responsibilities | [docs/data-responsibility.md](docs/data-responsibility.md) |
-| Review the current legal-risk register and escalation triggers | [docs/legal-risk-register.md](docs/legal-risk-register.md) |
-| Review the customer legal-pack drafts | [docs/legal/README.md](docs/legal/README.md) |
 
 ## Layout
 
@@ -309,7 +305,7 @@ certification.
 chat.py            the conversation loop, tool execution, the confirmation gate
 providers.py       provider abstraction and history-to-wire translation
 tools.py           tool definitions and the demo backend
-webhooks.py        the receiver Slack, Teams and Meta post to
+webhooks.py        the receiver GitHub and other support channels post to
 mobile.py          the approval screen, for a phone
 approvals.py       actions parked, waiting for a person
 handoffs.py        persistent human-handoff queue
@@ -329,7 +325,7 @@ doctor.py          configuration diagnosis
 i18n.py            everything the product says out loud
 regions.py         what differs between the US and the UK
 config.py          configuration and .env loading
-personas/          seventeen industry personas plus the default
+personas/          industry and transport-specific support personas
 knowledge/         documents to put in the knowledge base
 tests/             tests
 docs/              documentation, images, interactive demo
