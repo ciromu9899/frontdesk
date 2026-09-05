@@ -190,7 +190,7 @@ class SalonReminderTests(TestCase):
         store = tools.load_store("salon-reminders")
         store["reservations"]["R-REMIND"] = {
             "customer": "Buyer", "email": "buyer@example.com",
-            "date": "2030-01-02", "time": "12:00", "timezone": "UTC",
+            "date": "2030-01-02", "time": "07:00", "timezone": "America/New_York",
             "status": "confirmed", "service": "Haircut", "staff": "Alex",
             "location": "Downtown", "reminders": True, "reminder_status": "pending",
         }

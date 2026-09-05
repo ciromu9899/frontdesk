@@ -22,9 +22,13 @@ classifiers = [
     "Topic :: Office/Business",
 ]
 
-# The core runs on the standard library alone. Everything below is optional
-# so that evaluating Frontdesk never requires installing anything.
-dependencies = ["defusedxml>=0.7.1,<1", "pypdf>=6.16.1,<7"]
+# Keep runtime dependencies bounded so installs remain reproducible across
+# Windows, macOS and Linux.
+dependencies = [
+    "defusedxml>=0.7.1,<1",
+    "pypdf>=6.16.1,<7",
+    "tzdata>=2026.3,<2027",
+]
 
 [project.optional-dependencies]
 # Adaptive thinking with an explicit display needs a recent SDK; this
