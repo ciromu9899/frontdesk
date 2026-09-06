@@ -37,3 +37,20 @@ install or rollback at a drive root or user-profile root.
 
 Record the build hash, certificate subject and expiry, timestamp status, signer,
 verification output, acceptance result and rollback result in the release ticket.
+
+## Cross-platform GitHub attestation
+
+For public GitHub releases, run the `attest release` workflow after publishing
+the ZIP. The workflow checks out the requested tag, reproduces the deterministic
+archive, requires its SHA-256 digest to match the published checksum, and then
+uses GitHub's Sigstore-backed identity to sign its build provenance.
+
+After downloading the ZIP, verify that signature and repository identity with:
+
+```powershell
+gh attestation verify .\frontdesk-complete-1.7.0-2026-09-05.zip -R ciromu9899/frontdesk
+```
+
+This attestation is portable across operating systems and detects replacement or
+tampering. It does not replace Authenticode for Windows SmartScreen publisher
+trust; the certificate-and-catalog procedure above remains required for that.
