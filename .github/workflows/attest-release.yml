@@ -10,7 +10,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
   attestations: write
 
@@ -33,18 +33,8 @@ jobs:
       - name: Reproduce the release ZIP
         run: python build_release.py --output dist --tests-passed 282 --allow-unsigned
 
-      - name: Download the published checksum
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir release-checksum
-          gh release download "$RELEASE_TAG" \
-            --repo "$GITHUB_REPOSITORY" \
-            --pattern '*.zip.sha256' \
-            --dir release-checksum
-
-      - name: Match the published release exactly
-        run: cd dist && sha256sum --check ../release-checksum/*.zip.sha256
+      - name: Verify the generated checksum
+        run: cd dist && sha256sum --check *.zip.sha256
 
       - name: Sign the build provenance
         id: attest
@@ -52,10 +42,26 @@ jobs:
         with:
           subject-path: dist/*.zip
 
+      - name: Publish the attested release set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          zip_path="$(find dist -maxdepth 1 -type f -name '*.zip' -print -quit)"
+          cp "$BUNDLE_PATH" "${zip_path}.sigstore.json"
+          gh release upload "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber \
+            dist/*.zip \
+            dist/*.zip.sha256 \
+            dist/*.zip.manifest.json \
+            dist/*.zip.sigstore.json
+
       - name: Show verification command
         run: |
+          zip_name="$(basename "$(find dist -maxdepth 1 -type f -name '*.zip' -print -quit)")"
           echo 'Verify after downloading the ZIP:' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
-          echo "gh attestation verify frontdesk-complete-1.7.0-2026-09-05.zip -R $GITHUB_REPOSITORY" >> "$GITHUB_STEP_SUMMARY"
+          echo "gh attestation verify $zip_name -R $GITHUB_REPOSITORY" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           echo "Attestation: ${{ steps.attest.outputs.attestation-url }}" >> "$GITHUB_STEP_SUMMARY"

@@ -84,6 +84,18 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def source_data(path: Path) -> bytes:
+    """Read committed bytes so archives do not inherit checkout line endings."""
+    relative = path.relative_to(ROOT).as_posix()
+    try:
+        return subprocess.run(
+            ["git", "show", f"HEAD:{relative}"], cwd=ROOT, check=True,
+            capture_output=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError(f"could not read tracked file: {relative}") from exc
+
+
 def dependencies() -> list[dict]:
     result = []
     dependency_file = ROOT / "requirements.lock.txt"
@@ -102,11 +114,11 @@ def dependencies() -> list[dict]:
     return result
 
 
-def sbom(files: list[Path], release_version: str) -> dict:
+def sbom(files: list[Path], file_data: dict[Path, bytes], release_version: str) -> dict:
     components = dependencies()
     components.extend({
         "type": "file", "name": path.relative_to(ROOT).as_posix(),
-        "hashes": [{"alg": "SHA-256", "content": digest(path.read_bytes())}],
+        "hashes": [{"alg": "SHA-256", "content": digest(file_data[path])}],
     } for path in files)
     return {
         "bomFormat": "CycloneDX", "specVersion": "1.5", "version": 1,
@@ -132,10 +144,11 @@ def build(output: Path, *, tests_passed: int, allow_unsigned: bool) -> dict:
         raise RuntimeError("A signing certificate is not configured. Use --allow-unsigned only for a release candidate.")
     release_version = version()
     files = source_files()
+    file_data = {path: source_data(path) for path in files}
     output.mkdir(parents=True, exist_ok=True)
     package = output / f"frontdesk-complete-{release_version}-2026-09-05.zip"
-    file_hashes = {path.relative_to(ROOT).as_posix(): digest(path.read_bytes()) for path in files}
-    bill = sbom(files, release_version)
+    file_hashes = {path.relative_to(ROOT).as_posix(): digest(file_data[path]) for path in files}
+    bill = sbom(files, file_data, release_version)
     internal_manifest = {
         "product": "FrontDesk", "version": release_version,
         "built_at": "2026-09-05T00:00:00Z", "tests_passed": tests_passed,
@@ -145,7 +158,7 @@ def build(output: Path, *, tests_passed: int, allow_unsigned: bool) -> dict:
     }
     with zipfile.ZipFile(package, "w") as archive:
         for path in files:
-            zip_entry(archive, f"frontdesk/{path.relative_to(ROOT).as_posix()}", path.read_bytes())
+            zip_entry(archive, f"frontdesk/{path.relative_to(ROOT).as_posix()}", file_data[path])
         zip_entry(archive, "frontdesk/SBOM.cdx.json",
                   json.dumps(bill, indent=2, sort_keys=True).encode())
         zip_entry(archive, "frontdesk/RELEASE-MANIFEST.json",

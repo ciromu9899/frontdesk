@@ -40,10 +40,12 @@ verification output, acceptance result and rollback result in the release ticket
 
 ## Cross-platform GitHub attestation
 
-For public GitHub releases, run the `attest release` workflow after publishing
-the ZIP. The workflow checks out the requested tag, reproduces the deterministic
-archive, requires its SHA-256 digest to match the published checksum, and then
-uses GitHub's Sigstore-backed identity to sign its build provenance.
+For public GitHub releases, run the `attest release` workflow after creating the
+tag and release. The workflow checks out the requested tag, reproduces the
+deterministic archive, verifies its SHA-256 checksum, and uses GitHub's
+Sigstore-backed identity to sign its build provenance. Only after signing
+succeeds does it publish the ZIP, checksum, manifest, and offline Sigstore bundle
+to the existing release.
 
 After downloading the ZIP, verify that signature and repository identity with:
 
