@@ -3,6 +3,15 @@
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.7.1 - 2026-09-07
+
+- Added simplified salon setup and refreshed accessible-focus admin/chat styling.
+- Added desktop packaging preparation; OS-signed installers are not included.
+- Added seller-only Paddle sandbox checkout, verified webhook state, protected
+  ZIP delivery, and email-authenticated portal navigation. Real Paddle E2E is pending.
+- Added 20 tests since v1.7.0 (302 total locally); kept live sales disabled.
+- Removed outdated purchase links from the main README.
+
 ## 1.7.0 - 2026-09-05
 
 - Added a GitHub Issues and Discussions support channel with verified webhook

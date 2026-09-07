@@ -15,13 +15,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_OUTPUT = ROOT.parent.parent / "outputs"
-ZIP_TIMESTAMP = (2026, 9, 5, 0, 0, 0)
+ZIP_TIMESTAMP = (2026, 9, 7, 0, 0, 0)
 SKIP_PARTS = {
     ".git", "__pycache__", ".pytest_cache", "data", "dist", "build",
     "test-artifacts", "tests", ".build-cache", "windows-build", "windows-dist",
 }
 SKIP_SUFFIXES = {".pyc", ".pyo", ".db", ".db-wal", ".db-shm", ".zip"}
 CUSTOMER_EXCLUDED_FILES = {
+    "paddle_sales.py",
+    "paddle_sales_server.py",
+    "docs/paddle-sales-sandbox.md",
     "CHANGELOG.md",
     "build_release.py",
     "paypal.py",
@@ -123,7 +126,7 @@ def sbom(files: list[Path], file_data: dict[Path, bytes], release_version: str) 
     return {
         "bomFormat": "CycloneDX", "specVersion": "1.5", "version": 1,
         "metadata": {
-            "timestamp": "2026-09-05T00:00:00Z",
+            "timestamp": "2026-09-07T00:00:00Z",
             "component": {"type": "application", "name": "FrontDesk",
                           "version": release_version,
                           "licenses": [{"license": {"id": "Apache-2.0"}}]},
@@ -139,24 +142,35 @@ def zip_entry(archive: zipfile.ZipFile, name: str, data: bytes) -> None:
     archive.writestr(info, data)
 
 
-def build(output: Path, *, tests_passed: int, allow_unsigned: bool) -> dict:
+def build(output: Path, *, tests_passed: int, allow_unsigned: bool, working_tree: bool = False) -> dict:
     if not allow_unsigned:
         raise RuntimeError("A signing certificate is not configured. Use --allow-unsigned only for a release candidate.")
     release_version = version()
     files = source_files()
-    file_data = {path: source_data(path) for path in files}
+    if working_tree:
+        for name in ("build_installer.ps1", "package_macos.py", "packaging/windows.iss", "docs/desktop-distribution.md"):
+            path = ROOT / name
+            if path.is_file() and path not in files:
+                files.append(path)
+        files.sort()
+    file_data = {path: (path.read_bytes() if working_tree else source_data(path)) for path in files}
     output.mkdir(parents=True, exist_ok=True)
-    package = output / f"frontdesk-complete-{release_version}-2026-09-05.zip"
+    built_at = datetime.now(timezone.utc).isoformat() if working_tree else "2026-09-07T00:00:00Z"
+    suffix = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S-design-rc") if working_tree else "2026-09-07"
+    package = output / f"frontdesk-complete-{release_version}-{suffix}.zip"
     file_hashes = {path.relative_to(ROOT).as_posix(): digest(file_data[path]) for path in files}
     bill = sbom(files, file_data, release_version)
+    bill["metadata"]["timestamp"] = built_at
     internal_manifest = {
         "product": "FrontDesk", "version": release_version,
-        "built_at": "2026-09-05T00:00:00Z", "tests_passed": tests_passed,
+        "built_at": built_at, "tests_passed": tests_passed,
         "signature_status": "UNSIGNED_RELEASE_CANDIDATE",
         "rollback": "Use rollback.ps1 with the backup created by install.ps1.",
         "files": file_hashes,
     }
-    with zipfile.ZipFile(package, "w") as archive:
+    if working_tree:
+        internal_manifest["source"] = "local-working-tree; not the published GitHub v1.7.0 artifact"
+    with zipfile.ZipFile(package, "x") as archive:
         for path in files:
             zip_entry(archive, f"frontdesk/{path.relative_to(ROOT).as_posix()}", file_data[path])
         zip_entry(archive, "frontdesk/SBOM.cdx.json",
@@ -187,10 +201,11 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--tests-passed", type=int, required=True)
     parser.add_argument("--allow-unsigned", action="store_true")
+    parser.add_argument("--working-tree", action="store_true", help="Package local edits and approved desktop packaging files as a distinct unsigned candidate")
     args = parser.parse_args()
     try:
         result = build(args.output.resolve(), tests_passed=args.tests_passed,
-                       allow_unsigned=args.allow_unsigned)
+                       allow_unsigned=args.allow_unsigned, working_tree=args.working_tree)
     except (OSError, RuntimeError) as exc:
         print(f"error: {exc}")
         return 1

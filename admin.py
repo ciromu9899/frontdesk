@@ -26,6 +26,81 @@ import tools
 
 MAX_KNOWLEDGE_UPLOAD = 12 * 1024 * 1024
 
+SALON_FIELDS = (
+    ("name", "Salon name", 160),
+    ("hours", "Opening hours", 2000),
+    ("services", "Services and prices", 6000),
+    ("booking_url", "Booking website (optional)", 2000),
+)
+
+
+def salon_profile(tenant_id: str) -> dict:
+    directory, _ = rag.tenant_paths(tenant_id)
+    path = directory / ".salon-profile.json"
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
+def save_salon_profile(tenant_id: str, values: dict) -> None:
+    profile = {}
+    for key, label, limit in SALON_FIELDS:
+        value = values.get(key, "").strip()
+        if (not value and key != "booking_url") or len(value) > limit:
+            raise ValueError(f"Please enter {label.lower()} (up to {limit} characters).")
+        profile[key] = value
+    url = profile["booking_url"]
+    parsed = urlparse(url)
+    if url and (parsed.scheme != "https" or not parsed.hostname or parsed.username
+                or parsed.password or any(c.isspace() for c in url)):
+        raise ValueError("Please use a complete https:// booking website address.")
+    # Never use the optional shared-knowledge fallback for a tenant's setup.
+    if tenant_id != "default" and not rag.multi_tenant_knowledge():
+        raise ValueError("Enable tenant-isolated knowledge before saving salon details.")
+    directory, index = rag.tenant_paths(tenant_id)
+    directory.mkdir(parents=True, exist_ok=True)
+    profile_path = directory / ".salon-profile.json"
+    document = directory / "frontdesk-salon-profile.txt"
+    text = "\n\n".join(f"{label}:\n{profile[key]}" for key, label, _ in SALON_FIELDS)
+    text += "\n\nBooking policy: Direct customers to the booking website, if provided. "
+    text += "This information does not provide live availability or confirm appointments. "
+    text += "Ask staff about information that is not listed.\n"
+    previous = {path: path.read_bytes() if path.exists() else None
+                for path in (profile_path, document, index)}
+    try:
+        document.write_text(text, encoding="utf-8")
+        rag.build_index(tenant_id=tenant_id)
+        temporary = profile_path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(profile, ensure_ascii=False), encoding="utf-8")
+        temporary.replace(profile_path)
+    except Exception:
+        for path, content in previous.items():
+            if content is None:
+                path.unlink(missing_ok=True)
+            else:
+                path.write_bytes(content)
+        raise
+
+
+def salon_setup_form(profile: dict, csrf: str, error: str = "") -> str:
+    fields = []
+    for key, label, limit in SALON_FIELDS:
+        value = html.escape(profile.get(key, ""), quote=True)
+        required = "required" if key != "booking_url" else ""
+        if key in {"hours", "services"}:
+            control = f'<textarea id="{key}" name="{key}" rows="4" maxlength="{limit}" {required}>{value}</textarea>'
+        else:
+            kind = "url" if key == "booking_url" else "text"
+            control = f'<input id="{key}" name="{key}" type="{kind}" value="{value}" maxlength="{limit}" {required}>'
+        fields.append(f'<label for="{key}">{label}</label>{control}')
+    message = f'<p role="alert">{html.escape(error)}</p>' if error else ""
+    return ('<section class="card setup-card" style="max-width:720px;margin:auto;font-size:18px">'
+            '<p class="eyebrow">YOUR FRONT DESK · SALON SETUP</p>'
+            '<h1>Your salon, ready to answer</h1><p>Enter your details in any language. '
+            'Include the currency with prices. Saving makes these details available to the chatbot.</p>'
+            + message + '<form method="post" action="/setup" class="stack">'
+            + f'<input type="hidden" name="csrf" value="{csrf}">'
+            + "".join(fields) + '<button>Save salon details</button></form>'
+            '<p>You can edit these details anytime. Your booking website stays in charge of appointments.</p></section>')
+
 
 def _salon_enabled() -> bool:
     return bool({item.strip().lower() for item in
@@ -42,15 +117,16 @@ def _page(title: str, body: str) -> bytes:
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)} · Frontdesk</title>
 <style>
-:root{{--bg:#f3f6f5;--panel:#fff;--ink:#173330;--muted:#60716f;--brand:#0f6961;--line:#d9e3e1;--ok:#19714f;--bad:#a33b31}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif}}
-header{{background:#123d39;color:#fff;padding:18px 5vw}}header strong{{font-size:20px}}main{{max-width:1180px;margin:26px auto;padding:0 20px}}
-.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}}.card{{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 2px 8px #163c3810}}
+:root{{--bg:#faf7f2;--panel:#fffefa;--ink:#302c33;--muted:#68606b;--brand:#68455f;--line:#ded6db;--ok:#28614e;--bad:#a03236}}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,sans-serif}}
+header{{background:#493747;color:#fff;padding:20px 5vw}}header strong{{font-size:22px;letter-spacing:.03em}}main{{max-width:1180px;margin:32px auto;padding:0 20px}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}}.card{{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 6px 24px #49374708}}
 .metric{{font-size:28px;font-weight:700}}.muted{{color:var(--muted)}}.ok{{color:var(--ok)}}.bad{{color:var(--bad)}}
 table{{width:100%;border-collapse:collapse;font-size:13px}}th,td{{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}}code{{word-break:break-word}}
-input,button{{font:inherit;padding:10px 12px;border-radius:7px;border:1px solid var(--line)}}input{{width:100%}}button{{background:var(--brand);color:#fff;border:0;cursor:pointer}}form.inline{{display:inline}}nav{{float:right}}nav a{{color:#fff}}
-.stack{{display:grid;gap:8px}}.badge{{display:inline-block;border-radius:999px;padding:2px 8px;background:#e7f1ef}}textarea,select{{font:inherit;width:100%;padding:8px;border:1px solid var(--line);border-radius:7px}}
-</style></head><body><header><strong>Frontdesk Admin</strong><nav><a href="/logout">Sign out</a></nav></header><main>{body}</main></body></html>"""
+input,button{{font:inherit;min-height:48px;padding:12px 16px;border-radius:12px;border:1px solid #988994}}input{{width:100%;background:#fff}}button{{background:var(--brand);color:#fff;border:0;cursor:pointer;font-weight:650}}form.inline{{display:inline}}nav{{float:right}}nav a{{color:#fff;display:inline-flex;align-items:center;min-height:44px}}
+.stack{{display:grid;gap:10px}}.badge{{display:inline-block;border-radius:999px;padding:4px 12px;background:#e8efea}}textarea,select{{font:inherit;width:100%;padding:12px;border:1px solid #988994;border-radius:12px;background:#fff;color:var(--ink)}}
+a{{color:var(--brand);text-underline-offset:4px}}h1{{line-height:1.2;letter-spacing:-.025em;font-size:clamp(28px,4vw,40px)}}h2{{font-size:22px;line-height:1.3}}.eyebrow{{font-size:12px;font-weight:750;letter-spacing:.16em;color:var(--brand)}}.setup-card{{border-top:5px solid var(--brand)}}.setup-card label{{font-weight:650;margin-top:12px}}.setup-card button{{margin-top:20px}}:focus-visible{{outline:3px solid #28614e;outline-offset:4px}}button:hover{{background:#503349}}button:disabled{{opacity:.6;cursor:wait}}input,textarea{{scroll-margin:24px}}[role=alert]{{border-left:4px solid var(--bad);padding:12px;background:#fbeeee}}@media(max-width:600px){{main{{padding:0 12px;margin:20px auto}}.card{{padding:20px 16px}}header{{padding:12px 16px}}.grid{{grid-template-columns:1fr}}.setup-card button{{width:100%}}}}
+</style></head><body><header><strong>FrontDesk</strong><nav><a href="/logout">Sign out</a></nav></header><main>{body}</main></body></html>"""
     return document.encode("utf-8")
 
 
@@ -164,6 +240,14 @@ class AdminHandler(BaseHTTPRequestHandler):
             self._send(HTTPStatus.SEE_OTHER, b"", headers={"Location": "/login"})
             return
         principal, token = authenticated
+
+        if path == "/setup":
+            if not _salon_enabled():
+                self._send(HTTPStatus.NOT_FOUND, b"Not found")
+                return
+            self._send(HTTPStatus.OK, _page("Salon setup", salon_setup_form(
+                salon_profile(principal.tenant_id), _csrf(token, self.secret))))
+            return
 
         if path == "/api/status":
             valid, count, chain = audit.verify()
@@ -301,6 +385,7 @@ class AdminHandler(BaseHTTPRequestHandler):
         valid_class = "ok" if valid else "bad"
         body = f"""
 <h1>Operations overview</h1><p class="muted">Signed in as {html.escape(principal.subject)} · tenant {html.escape(principal.tenant_id)}</p>
+{'<section class="card"><h2>Salon setup</h2><p><a href="/setup">Set up or edit your salon in one form</a></p></section>' if _salon_enabled() else ''}
 <section class="grid">
   <article class="card"><div class="muted">Knowledge files</div><div class="metric">{status['files']}</div><div>{status['chunks']} indexed chunks</div></article>
   <article class="card"><div class="muted">Audit chain</div><div class="metric {valid_class}">{'Valid' if valid else 'Invalid'}</div><div>{event_count} events · head {html.escape(chain[:12])}</div></article>
@@ -371,7 +456,7 @@ class AdminHandler(BaseHTTPRequestHandler):
                 return
             audit.record("admin.login_succeeded", actor=principal.subject, tenant_id=principal.tenant_id)
             self._send(HTTPStatus.SEE_OTHER, b"", headers={
-                "Location": "/",
+                "Location": "/setup" if _salon_enabled() and not salon_profile(principal.tenant_id) else "/",
                 "Set-Cookie": (
                     f"frontdesk_access={token}; Path=/; HttpOnly; SameSite=Strict"
                     + self._secure()
@@ -386,6 +471,22 @@ class AdminHandler(BaseHTTPRequestHandler):
         principal, token = authenticated
         if not hmac.compare_digest(form.get("csrf", ""), _csrf(token, self.secret)):
             self._send(HTTPStatus.FORBIDDEN, _page("Forbidden", "<h1>CSRF validation failed</h1>"))
+            return
+        if path == "/setup" and _salon_enabled():
+            try:
+                save_salon_profile(principal.tenant_id, form)
+            except ValueError as exc:
+                self._send(HTTPStatus.BAD_REQUEST, _page("Check salon details", salon_setup_form(
+                    form, _csrf(token, self.secret), str(exc))))
+                return
+            except OSError:
+                self._send(HTTPStatus.INTERNAL_SERVER_ERROR, _page("Save failed", salon_setup_form(
+                    form, _csrf(token, self.secret), "Could not save. Please try again; your previous details were kept.")))
+                return
+            self._send(HTTPStatus.OK, _page("Salon details saved", '<section class="card"><h1>Salon details saved</h1>'
+                '<p>Your hours, services and booking information are ready for the chatbot. '
+                'Try asking about your opening hours and prices in customer chat before sharing it.</p>'
+                '<p><a href="/setup">Edit details</a> · <a href="/">Open shared inbox</a></p></section>'))
             return
         if path == "/knowledge/reindex":
             result = rag.build_index(tenant_id=principal.tenant_id)

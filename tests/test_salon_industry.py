@@ -151,7 +151,9 @@ class SalonIndustryPackTests(TestCase):
                 login = urllib.request.Request(
                     base + "/login",
                     data=urllib.parse.urlencode({"token": token}).encode(), method="POST")
-                dashboard = opener.open(login, timeout=2).read().decode()
+                first_page = opener.open(login, timeout=2).read().decode()
+                self.assertIn("Your salon, ready to answer", first_page)
+                dashboard = opener.open(base + "/", timeout=2).read().decode()
                 self.assertIn("Upcoming salon appointments", dashboard)
                 self.assertIn("R-MOBILE", json.dumps(json.loads(
                     opener.open(base + "/api/appointments", timeout=2).read())))

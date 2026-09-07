@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "frontdesk"
-version = "1.7.0"
+version = "1.7.1"
 description = "A tenant-isolated AI support bot for GitHub Issues and Discussions."
 readme = "README.md"
 requires-python = ">=3.11"

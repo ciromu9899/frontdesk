@@ -21,15 +21,16 @@ Teams, Meta, WhatsApp, and email channels remain available.
 
 **Start here:** [GitHub Issues and Discussions setup](docs/github-support.md).
 
-**Choose a one-time FrontDesk plan:**
+**v1.7.1 release candidate — subscription sales are not open here.**
 
-- [Solo — $299 USD](https://www.paypal.com/ncp/payment/D973WXW3HCZ9E), one location and self-setup;
-- [Shop — $699 USD](https://www.paypal.com/ncp/payment/9SDPW2BCLUB44), one location with initial setup assistance;
-- [Multi — $1,199 USD](https://www.paypal.com/ncp/payment/6EVAGLWEC77EL), up to five locations with connector setup assistance.
+The previous one-time offers are no longer linked from this page. Paddle
+checkout, delivery and cancellation integration is sandbox-only and has not
+completed real Paddle end-to-end testing. Marketplace Action publication is
+not a paid Marketplace App listing. Do not use this release to take live payments.
 
-This is ShellieSoftwareTools' external product-sale page. PayPal is not embedded
-in FrontDesk, and the delivered application does not create, capture or refund
-payments.
+This release includes the salon setup form and refreshed admin/chat design.
+Windows/macOS signing and packaging scripts are preparation tools, not signed
+installers. Seller-side Paddle code is excluded from the customer ZIP.
 
 **Seller:** ShellieSoftwareTools, operated by Hiroshi Aoki  
 **US mailing address (CMRA):** 444 Alaska Avenue, Suite #CPT315,

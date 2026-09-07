@@ -256,16 +256,16 @@ def _page(lang: str, csrf: str, nonce: str, *, embedded: bool = False) -> bytes:
     embed_class = " embedded" if embedded else ""
     document = f"""<!doctype html><html lang="{lang}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{safe['title']} · Frontdesk</title>
-<style nonce="{nonce}">:root{{--bg:#f5f7f6;--panel:#fff;--ink:#142d2a;--muted:#536966;--brand:#08645b;--focus:#ffbf47}}
+<style nonce="{nonce}">:root{{--bg:#faf7f2;--panel:#fffefa;--ink:#302c33;--muted:#68606b;--brand:#68455f;--focus:#28614e}}
 *{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,sans-serif}}
 .skip{{position:absolute;left:-9999px}}.skip:focus{{left:12px;top:12px;background:#fff;padding:10px;z-index:2}}
 main{{max-width:760px;margin:auto;padding:24px}}header{{display:flex;justify-content:space-between;gap:16px;align-items:start}}
-.chat{{background:var(--panel);border:1px solid #d5dfdd;border-radius:16px;box-shadow:0 5px 24px #153d3814;overflow:hidden}}
+.chat{{background:var(--panel);border:1px solid #ded6db;border-radius:24px;box-shadow:0 8px 32px #4937470c;overflow:hidden}}
 #log{{height:min(58vh,520px);overflow:auto;padding:20px}}.message{{max-width:82%;padding:11px 14px;border-radius:14px;margin:10px 0;white-space:pre-wrap}}
-.user{{margin-left:auto;background:#d9f0ec}}.bot{{background:#eef1f0}}form{{border-top:1px solid #d5dfdd;padding:16px}}
+.user{{margin-left:auto;background:#eee3ed}}.bot{{background:#e8efea}}form{{border-top:1px solid #ded6db;padding:20px}}h1{{letter-spacing:-.03em;font-size:clamp(28px,4vw,38px);line-height:1.2}}.message{{overflow-wrap:anywhere;line-height:1.7}}
 label{{font-weight:650;display:block}}textarea{{width:100%;min-height:90px;margin:7px 0;padding:12px;font:inherit;border:1px solid #82938f;border-radius:8px}}
-button{{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:11px 20px;font:inherit;font-weight:700;cursor:pointer}}button.secondary{{background:#fff;color:var(--brand);border:1px solid var(--brand)}}
-a{{color:#075c54}}.linkedin{{display:inline-block;margin:.25rem 0 1rem;font-weight:700}}:focus-visible{{outline:4px solid var(--focus);outline-offset:3px}}.muted{{color:var(--muted)}}
+button{{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 22px;min-height:48px;font:inherit;font-weight:650;cursor:pointer}}button.secondary{{background:#fff;color:var(--brand);border:1px solid var(--brand)}}button:disabled{{opacity:.6;cursor:wait}}
+a{{color:var(--brand);text-underline-offset:4px}}nav a{{display:inline-block;padding:10px 6px;min-height:44px}}.linkedin{{display:inline-block;margin:.25rem 0 1rem;font-weight:700}}:focus-visible{{outline:3px solid var(--focus);outline-offset:3px}}.muted{{color:var(--muted)}}
 .actions{{display:flex;gap:8px;flex-wrap:wrap}}#rating[hidden]{{display:none}}#rating button{{min-width:44px;padding:8px}}
 @media(max-width:520px){{main{{padding:12px}}#log{{height:55vh}}.message{{max-width:94%}}header{{display:block}}}}
 body.embedded main{{padding:8px}}body.embedded header h1{{font-size:1.25rem}}body.embedded #log{{height:52vh}}

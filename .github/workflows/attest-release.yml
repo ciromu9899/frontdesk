@@ -6,7 +6,7 @@ on:
       tag:
         description: Existing GitHub Release tag to reproduce and attest
         required: true
-        default: v1.7.0
+        default: v1.7.1
         type: string
 
 permissions:
@@ -31,7 +31,7 @@ jobs:
           python-version: "3.13"
 
       - name: Reproduce the release ZIP
-        run: python build_release.py --output dist --tests-passed 282 --allow-unsigned
+        run: python build_release.py --output dist --tests-passed 302 --allow-unsigned
 
       - name: Verify the generated checksum
         run: cd dist && sha256sum --check *.zip.sha256

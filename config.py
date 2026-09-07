@@ -23,6 +23,8 @@ def application_data_dir() -> Path:
     if configured:
         return Path(configured).expanduser().resolve()
     if getattr(sys, "frozen", False):
+        if sys.platform == "darwin":
+            return Path.home() / "Library" / "Application Support" / "ShellieSoftwareTools" / "FrontDesk" / "data"
         local = os.environ.get("LOCALAPPDATA", "").strip()
         base = Path(local) if local else Path.home() / "AppData" / "Local"
         return base / "ShellieSoftwareTools" / "FrontDesk" / "data"

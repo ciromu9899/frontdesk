@@ -11,6 +11,8 @@ import subprocess
 import sys
 import urllib.request
 import zipfile
+import tomllib
+from datetime import datetime, timezone
 from pathlib import Path
 
 import local_ai
@@ -21,6 +23,7 @@ DEFAULT_OUTPUT = ROOT.parent.parent / "outputs"
 CACHE = ROOT / ".build-cache"
 BUILD = ROOT / "windows-build"
 DIST = ROOT / "windows-dist"
+VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
 
 
 def sha256_path(path: Path) -> str:
@@ -92,7 +95,7 @@ def write_sbom(app: Path) -> Path:
                 "hashes": [{"alg": "SHA-256", "content": sha256_path(path)}],
             })
     components = [
-        {"type": "application", "name": "FrontDesk", "version": "1.5.0",
+        {"type": "application", "name": "FrontDesk", "version": VERSION,
          "licenses": [{"license": {"id": "Apache-2.0"}}]},
         {"type": "framework", "name": "CPython", "version": sys.version.split()[0],
          "licenses": [{"license": {"name": "Python-2.0"}}]},
@@ -107,7 +110,7 @@ def write_sbom(app: Path) -> Path:
     ]
     bill = {
         "bomFormat": "CycloneDX", "specVersion": "1.5", "version": 1,
-        "metadata": {"timestamp": "2026-08-29T00:00:00Z", "component": components[0]},
+        "metadata": {"timestamp": datetime.now(timezone.utc).isoformat(), "component": components[0]},
         "components": components[1:] + files,
     }
     destination = app / "SBOM.cdx.json"
@@ -147,7 +150,7 @@ def build(output: Path) -> dict:
         shutil.copy2(ROOT / document, app / document)
     write_sbom(app)
     output.mkdir(parents=True, exist_ok=True)
-    package = output / "frontdesk-windows-portable-1.5.0-2026-08-29.zip"
+    package = output / f"frontdesk-windows-portable-{VERSION}-{datetime.now(timezone.utc):%Y-%m-%d}.zip"
     with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in sorted(app.rglob("*")):
             if path.is_file():
@@ -156,8 +159,8 @@ def build(output: Path) -> dict:
     package.with_suffix(package.suffix + ".sha256").write_text(
         f"{package_hash}  {package.name}\n", encoding="ascii")
     manifest = {
-        "product": "FrontDesk", "version": "1.5.0", "platform": "Windows x64 CPU",
-        "package": package.name, "sha256": package_hash, "tests_passed": 264,
+        "product": "FrontDesk", "version": VERSION, "platform": "Windows x64 CPU",
+        "package": package.name, "sha256": package_hash,
         "python_install_required": False, "ollama_install_required": False,
         "model_bundled": False, "model_first_run_download_gb": 5.03,
         "llama_cpp_version": local_ai.LLAMA_CPP_VERSION,

@@ -65,3 +65,17 @@ test service IDs, staff IDs, location time zones, overlapping appointments,
 cancellation rules, reminder delivery, provider rate limits, and recovery from a
 failed booking request. The included local store proves the workflow, not a
 Fresha, Square Appointments, Vagaro, or Mindbody integration.
+# Quick salon setup
+
+After starting FrontDesk in salon mode, sign in to the shared inbox. On your
+first visit, the salon setup form opens automatically. Enter your salon name,
+opening hours, services and prices (including currency), and optionally your
+existing HTTPS booking website. Select **Save salon details**.
+
+FrontDesk saves the details for this tenant and updates its knowledge index
+automatically. No document editing or indexing command is needed. You can return
+through **Salon setup** on the dashboard to edit them. Try opening-hours and
+pricing questions in customer chat before sharing it. A configured AI provider
+is still required for AI answers; an Echo demonstration does not answer questions.
+The booking link directs customers to your existing booking service and does not
+confirm appointments or check live availability.
